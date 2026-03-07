@@ -21,6 +21,22 @@ const errorSchema = new mongoose.Schema(
       type: String
     },
 
+    resource: {
+      type: String
+    },
+
+    tag: {
+      type: String
+    },
+
+    requestUrl: {
+      type: String
+    },
+
+    httpStatus: {
+      type: Number
+    },
+
     userAgent: {
       type: String
     },

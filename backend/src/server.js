@@ -29,17 +29,35 @@ connectDB();
 // ── CORS ──────────────────────────────────────────────────────────────────────
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://localhost:3000",
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
 ];
-app.use(cors({
+
+const dashboardCors = cors({
   origin: (origin, cb) => {
     // Allow requests with no origin (e.g. curl, mobile apps, SDK)
     if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
     cb(new Error("CORS: origin not allowed"));
   },
   credentials: true
-}));
+});
+
+const sdkCors = cors({ origin: "*" });
+
+app.use((req, res, next) => {
+  // Allow any origin for the SDK ingest endpoint (POST /api/errors)
+  if (req.path === "/api/errors" && req.method === "POST") {
+    return sdkCors(req, res, next);
+  }
+  // Allow OPTIONS preflight for the SDK ingest endpoint
+  if (req.path === "/api/errors" && req.method === "OPTIONS") {
+    if (req.headers["access-control-request-headers"]?.toLowerCase().includes("x-api-key")) {
+      return sdkCors(req, res, next);
+    }
+  }
+  return dashboardCors(req, res, next);
+});
 
 app.use(express.json({ limit: "1mb" })); // Guard against huge JSON payloads
 
@@ -63,16 +81,17 @@ const ingestLimiter = rateLimit({
 // ── Routes ─────────────────────────────────────────────────────────────────────
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/projects", projectRoutes);
-app.use("/api/errors", errorRoutes);
-
-// SDK static files
-app.use("/sdk", express.static(path.join(__dirname, "../sdk")));
 
 // Apply separate rate limit to the public SDK ingest endpoint only
 app.use("/api/errors", (req, res, next) => {
-  if (req.method === "POST") return ingestLimiter(req, res, next);
+  if (req.method === "POST" && (req.path === "/" || req.path === "")) {
+    return ingestLimiter(req, res, next);
+  }
   next();
-});
+}, errorRoutes);
+
+// SDK static files
+app.use("/sdk", express.static(path.join(__dirname, "../sdk")));
 
 app.get("/", (req, res) => {
   res.send("BugScope API Running");

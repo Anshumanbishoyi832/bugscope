@@ -60,7 +60,7 @@ function Errors() {
       {/* Toolbar / Filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-gray-50 p-4 border border-gray-200 rounded-lg shrink-0">
 
-        <div className="flex w-full sm:w-auto flex-1 gap-4 items-center">
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto flex-1 gap-4 items-center">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input

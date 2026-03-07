@@ -26,7 +26,7 @@ export function Sidebar({ className }) {
     };
 
     return (
-        <aside className={cn("hidden md:flex flex-col w-64 border-r border-zinc-800 bg-[#0f172a] h-full", className)}>
+        <aside className={cn("flex flex-col w-64 border-r border-zinc-800 bg-[#0f172a] h-full", className)}>
             <div className="flex h-16 items-center px-6 border-b border-zinc-800 space-x-3">
                 <div className="h-8 w-8 rounded-md bg-blue-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]">
                     <Layers className="h-5 w-5" />

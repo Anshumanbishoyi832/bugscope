@@ -21,7 +21,7 @@ export function ErrorTable({ errors, onRowClick, onResolve, emptyStateMessage = 
     }
 
     return (
-        <div className="w-full overflow-hidden border border-gray-200 rounded-lg bg-white">
+        <div className="w-full overflow-x-auto border border-gray-200 rounded-lg bg-white">
             <table className="w-full text-sm text-left relative">
                 <thead className="text-xs text-gray-500 bg-gray-50 uppercase border-b border-gray-200">
                     <tr>

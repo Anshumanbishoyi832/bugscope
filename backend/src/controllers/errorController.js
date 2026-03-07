@@ -21,7 +21,7 @@ export const ingestError = async (req, res) => {
       });
     }
 
-    const { message, stack, url, userAgent, timestamp } = req.body;
+    const { message, stack, url, userAgent, timestamp, resource, tag, requestUrl, httpStatus } = req.body;
 
     const error = await ErrorLog.create({
       projectId: project._id,
@@ -29,7 +29,11 @@ export const ingestError = async (req, res) => {
       stack,
       url,
       userAgent,
-      timestamp
+      timestamp,
+      resource,
+      tag,
+      requestUrl,
+      httpStatus
     });
 
     res.status(201).json({

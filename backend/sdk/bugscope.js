@@ -39,17 +39,18 @@
 
     captureGlobalErrors() {
 
-      window.onerror = (message, source, lineno, colno, error) => {
+      window.addEventListener("error", (event) => {
+        // Ignore resource errors here, they are handled by captureResourceErrors
+        if (event.target && (event.target.src || event.target.href)) return;
 
         this.sendError({
-          message,
-          stack: error ? error.stack : null,
+          message: event.message || "Unknown Error",
+          stack: event.error ? event.error.stack : null,
           url: window.location.href,
           userAgent: navigator.userAgent,
           timestamp: new Date().toISOString()
         });
-
-      };
+      });
 
     }
 
@@ -118,17 +119,23 @@
 
       window.fetch = async (...args) => {
 
+        const requestUrl = typeof args[0] === "string" ? args[0] : args[0]?.url;
+
+        // Prevent intercepting our own error reports to avoid infinite loops
+        if (requestUrl && requestUrl.includes(this.endpoint)) {
+          return originalFetch(...args);
+        }
+
         const response = await originalFetch(...args);
 
         if (!response.ok) {
 
-          const requestUrl = typeof args[0] === "string" ? args[0] : args[0]?.url;
           const syntheticStack = `NetworkError: HTTP ${response.status} (${response.statusText || "Error"})\n    at fetch: ${requestUrl}\n    on page: ${window.location.href}`;
 
           this.sendError({
             message: `Network request failed — HTTP ${response.status}`,
             requestUrl: requestUrl,
-            status: response.status,
+            httpStatus: response.status,
             stack: syntheticStack,
             url: window.location.href,
             userAgent: navigator.userAgent,

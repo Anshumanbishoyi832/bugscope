@@ -96,7 +96,7 @@ function Projects() {
                 {/* API Key Section */}
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-2 block">Project API Key</label>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <Input
                       value={project.apiKey}
                       readOnly
